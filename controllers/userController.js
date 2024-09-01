@@ -141,10 +141,65 @@ const loginStatus = asyncHandler(async (req, res) => {
   return res.json(false);
 });
 
+// Update User Profile
+// @route   PATCH /api/users/updateprofile
+const updateProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    const { username, email, photo } = user;
+    user.username = req.body.username || username;
+    user.email = email;
+    user.photo = req.body.photo || photo;
+
+    const updatedUser = await user.save();
+    res.status(200).json({
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      photo: updatedUser.photo,
+    });
+  } else {
+    res.status(404);
+    throw new Error("User not found");
+  }
+});
+
+// Change Password
+// @route   PATCH /api/users/changepassword
+const changePassword = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+  const { oldPassword, password } = req.body;
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found, please signup");
+  }
+  // Validate
+  if (!oldPassword || !password) {
+    res.status(400);
+    throw new Error("Please fill in old and new password");
+  }
+
+  // Check if old password matches in DB
+  const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+  // Save new password
+  if (user && isMatch) {
+    user.password = password;
+    await user.save();
+    res.status(200).json({ message: "Password updated successfully" });
+  } else {
+    res.status(400);
+    throw new Error("Old password is incorrect");
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
   getProfile,
   loginStatus,
+  updateProfile,
+  changePassword,
 };

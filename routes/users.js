@@ -5,6 +5,8 @@ const {
   logoutUser,
   getProfile,
   loginStatus,
+  updateProfile,
+  changePassword,
 } = require("../controllers/userController");
 const { adminOnly, protect } = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -26,5 +28,11 @@ router.get("/profile", protect, getProfile);
 
 // Route to get login status
 router.get("/loggedin", loginStatus);
+
+// Route to update profile
+router.patch("/updateprofile", protect, updateProfile);
+
+// Route to change password
+router.patch("/changepassword", protect, changePassword);
 
 module.exports = router;
