@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 require("dotenv").config();
+const userRoutes = require("./routes/users");
+const errorHandler = require("./middleware/errorMiddleware");
 
 const app = express();
 
@@ -9,6 +11,19 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+// // Logging Middleware to check incoming requests
+// app.use((req, res, next) => {
+//   console.log("Incoming Request:", req.method, req.url);
+//   console.log("Request Body:", req.body);
+//   next();
+// });
+
+// Routes
+app.use("/api/users", userRoutes);
+
+// Error Handler
+app.use(errorHandler);
 
 // Connect to MongoDB
 mongoose
