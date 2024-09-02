@@ -15,9 +15,9 @@ const router = express.Router();
 
 // Routes
 // Register route protected by adminOnly middleware
-// router.post("/register", protect, adminOnly, registerUser);
+router.post("/register", protect, adminOnly, registerUser);
 // Modified Route for Testing (Remove adminOnly temporarily)
-router.post("/register", registerUser);
+// router.post("/register", registerUser);
 
 // Login route
 router.post("/login", loginUser);

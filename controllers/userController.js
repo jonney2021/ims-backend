@@ -83,6 +83,10 @@ const loginUser = asyncHandler(async (req, res) => {
     // Generate JWT token
     const token = generateToken(user._id);
 
+    // Update last login time
+    user.lastLogin = Date.now();
+    await user.save();
+
     // Send token in HTTP-only cookie
     res.cookie("token", token, {
       path: "/",
@@ -99,6 +103,8 @@ const loginUser = asyncHandler(async (req, res) => {
       photo: user.photo,
       role: user.role,
       token,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin,
     });
   } else {
     res.status(401);

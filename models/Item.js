@@ -1,0 +1,42 @@
+const mongoose = require("mongoose");
+
+const itemSchema = new mongoose.Schema({
+  name: {
+    type: String,
+    required: [true, "Item name is required"],
+    trim: true,
+    maxLength: [50, "Item name must not be more than 50 characters long"],
+  },
+  description: {
+    type: String,
+    trim: true,
+    maxLength: [200, "Description must not be more than 200 characters long"],
+  },
+  category: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Category",
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: [true, "Quantity is required"],
+    min: [0, "Quantity cannot be negative"],
+    default: 0,
+  },
+  reorder_level: {
+    type: Number,
+    required: [true, "Reorder level is required"],
+    min: [0, "Reorder level cannot be negative"],
+    default: 10, // Adjust this default as per your business logic
+  },
+  last_updated: {
+    type: Date,
+    default: Date.now,
+  },
+  photo: {
+    type: String,
+    default: "https://via.placeholder.com/100", // Default placeholder image URL
+  },
+});
+
+module.exports = mongoose.model("Item", itemSchema);
