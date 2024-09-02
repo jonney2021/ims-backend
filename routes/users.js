@@ -11,8 +11,8 @@ const {
   resetPassword,
   getAllUsers,
   getUserByName,
-  updateUser,
-  deleteUser,
+  adminUpdateUser,
+  adminDeleteUser,
 } = require("../controllers/userController");
 const { adminOnly, protect } = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -50,13 +50,13 @@ router.put("/resetpassword/:resetToken", resetPassword);
 // Router to admin get all users
 router.get("/all", protect, adminOnly, getAllUsers);
 
-// Router to admin get user by name
-router.get("/:name", protect, adminOnly, getUserByName);
+// Router to admin get user by username
+router.get("/:username", protect, adminOnly, getUserByName);
 
 // Router to admin update user
-router.patch("/update/:id", protect, adminOnly, updateUser);
+router.patch("/update/:id", protect, adminOnly, adminUpdateUser);
 
 // Router to admin delete user
-router.delete("/delete/:id", protect, adminOnly, deleteUser);
+router.delete("/delete/:id", protect, adminOnly, adminDeleteUser);
 
 module.exports = router;
