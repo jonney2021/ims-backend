@@ -7,15 +7,17 @@ const {
   loginStatus,
   updateProfile,
   changePassword,
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/userController");
 const { adminOnly, protect } = require("../middleware/authMiddleware");
 const router = express.Router();
 
 // Routes
 // Register route protected by adminOnly middleware
-router.post("/register", protect, adminOnly, registerUser);
+// router.post("/register", protect, adminOnly, registerUser);
 // Modified Route for Testing (Remove adminOnly temporarily)
-// router.post("/register", registerUser);
+router.post("/register", registerUser);
 
 // Login route
 router.post("/login", loginUser);
@@ -34,5 +36,11 @@ router.patch("/updateprofile", protect, updateProfile);
 
 // Route to change password
 router.patch("/changepassword", protect, changePassword);
+
+// Route to forgot password
+router.post("/forgotpassword", forgotPassword);
+
+// Route to reset password
+router.put("/resetpassword/:resetToken", resetPassword);
 
 module.exports = router;
