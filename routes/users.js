@@ -9,6 +9,10 @@ const {
   changePassword,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  getUserByName,
+  updateUser,
+  deleteUser,
 } = require("../controllers/userController");
 const { adminOnly, protect } = require("../middleware/authMiddleware");
 const router = express.Router();
@@ -42,5 +46,17 @@ router.post("/forgotpassword", forgotPassword);
 
 // Route to reset password
 router.put("/resetpassword/:resetToken", resetPassword);
+
+// Router to admin get all users
+router.get("/all", protect, adminOnly, getAllUsers);
+
+// Router to admin get user by name
+router.get("/:name", protect, adminOnly, getUserByName);
+
+// Router to admin update user
+router.patch("/update/:id", protect, adminOnly, updateUser);
+
+// Router to admin delete user
+router.delete("/delete/:id", protect, adminOnly, deleteUser);
 
 module.exports = router;

@@ -12,6 +12,13 @@ const itemSchema = new mongoose.Schema({
     trim: true,
     maxLength: [200, "Description must not be more than 200 characters long"],
   },
+  itemCode: {
+    type: String,
+    required: [true, "Item code is required"],
+    unique: true,
+    trim: true,
+    maxLength: [20, "Item code must not be more than 20 characters long"],
+  },
   category: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -23,13 +30,13 @@ const itemSchema = new mongoose.Schema({
     min: [0, "Quantity cannot be negative"],
     default: 0,
   },
-  reorder_level: {
+  reorderLevel: {
     type: Number,
     required: [true, "Reorder level is required"],
     min: [0, "Reorder level cannot be negative"],
     default: 10, // Adjust this default as per your business logic
   },
-  last_updated: {
+  lastUpdated: {
     type: Date,
     default: Date.now,
   },

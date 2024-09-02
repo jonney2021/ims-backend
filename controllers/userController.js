@@ -121,7 +121,6 @@ const logoutUser = asyncHandler(async (req, res) => {
 
 // Get User Profile
 // @route   GET /api/users/profile
-
 const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id).select("-password");
 
@@ -135,7 +134,6 @@ const getProfile = asyncHandler(async (req, res) => {
 
 // Get login status
 // @route   GET /api/users/loggedin
-
 const loginStatus = asyncHandler(async (req, res) => {
   const token = req.cookies.token;
   if (!token) {
@@ -295,8 +293,86 @@ const resetPassword = asyncHandler(async (req, res) => {
 
   // Delete token from DB
   await userToken.deleteOne();
-
   res.status(200).json({ message: "Password reset successful" });
+});
+
+// @desc    Get all users
+// @route   GET /api/users
+// @access  Admin
+const getAllUsers = asyncHandler(async (req, res) => {
+  // Fetch all users excluding passwords
+  const users = await User.find().select("-password");
+
+  res.status(200).json(users);
+});
+
+// @desc    Get user by username
+// @route   GET /api/users/:username
+// @access  Admin
+const getUserByName = asyncHandler(async (req, res) => {
+  const { username } = req.params;
+
+  // Find user by username
+  const user = await User.findOne({ username }).select("-password");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user);
+});
+
+// @desc    Admin Update User
+// @route   PATCH /api/users/:id
+// @access  Admin
+const adminUpdateUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { username, email, role } = req.body;
+
+  // Find the user by ID
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Update the user's information
+  user.username = username || user.username;
+  user.email = email || user.email;
+  user.role = role || user.role; // Update role only if provided
+
+  const updatedUser = await user.save();
+
+  res.status(200).json({
+    message: "User updated successfully",
+    user: {
+      _id: updatedUser._id,
+      username: updatedUser.username,
+      email: updatedUser.email,
+      role: updatedUser.role,
+    },
+  });
+});
+
+// @desc    Admin Delete User
+// @route   DELETE /api/users/:id
+// @access  Admin
+const adminDeleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Find the user by ID
+  const user = await User.findById(id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  // Delete the user
+  await user.deleteOne();
+  res.status(200).json({ message: "User deleted successfully" });
 });
 
 module.exports = {
@@ -309,4 +385,8 @@ module.exports = {
   changePassword,
   forgotPassword,
   resetPassword,
+  getAllUsers,
+  getUserByName,
+  adminUpdateUser,
+  adminDeleteUser,
 };

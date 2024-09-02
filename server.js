@@ -4,6 +4,7 @@ const cors = require("cors");
 require("dotenv").config();
 const userRoutes = require("./routes/users");
 const itemRoutes = require("./routes/items");
+const categoryRoutes = require("./routes/categories");
 const errorHandler = require("./middleware/errorMiddleware");
 const cookieParser = require("cookie-parser");
 
@@ -25,6 +26,7 @@ app.use(cookieParser());
 // Routes
 app.use("/api/users", userRoutes);
 app.use("/api/items", itemRoutes);
+app.use("/api/categories", categoryRoutes);
 
 // Error Handler
 app.use(errorHandler);

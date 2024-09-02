@@ -23,6 +23,8 @@ const createCategory = asyncHandler(async (req, res) => {
     description,
   });
 
+  //   const newCategory = await Category.create({ name, description });
+
   const savedCategory = await newCategory.save();
   res.status(201).json(savedCategory);
 });
@@ -59,7 +61,8 @@ const deleteCategory = asyncHandler(async (req, res) => {
     throw new Error("Category not found");
   }
 
-  await category.remove();
+  await Category.findByIdAndDelete(id);
+
   res.status(200).json({ message: "Category removed" });
 });
 
