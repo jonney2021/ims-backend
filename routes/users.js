@@ -48,7 +48,7 @@ router.post("/forgotpassword", forgotPassword);
 router.put("/resetpassword/:resetToken", resetPassword);
 
 // Router to admin get all users
-router.get("/all", protect, adminOnly, getAllUsers);
+router.get("/", getAllUsers);
 
 // Router to admin get user by username
 router.get("/:username", protect, adminOnly, getUserByName);
