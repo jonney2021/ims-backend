@@ -1,6 +1,7 @@
 const Item = require("../models/Item");
 const Category = require("../models/Category");
 const asyncHandler = require("express-async-handler");
+const cloudinary = require("cloudinary").v2;
 
 // @desc    Get all items
 // @route   GET /api/items
@@ -44,15 +45,8 @@ const getItemByCode = asyncHandler(async (req, res) => {
 // @desc    Create a new item
 // @route   POST /api/items
 const createItem = asyncHandler(async (req, res) => {
-  const {
-    name,
-    description,
-    itemCode,
-    category,
-    quantity,
-    reorderLevel,
-    photo,
-  } = req.body;
+  const { name, description, itemCode, category, quantity, reorderLevel } =
+    req.body;
 
   if (
     !name ||
@@ -77,6 +71,22 @@ const createItem = asyncHandler(async (req, res) => {
   if (existingItem) {
     res.status(400);
     throw new Error("Item code already exists");
+  }
+
+  let photo = "https://via.placeholder.com/100"; // Default placeholder image URL
+
+  // Handle image upload to Cloudinary if a file is provided
+  if (req.file) {
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "IMS items",
+        resource_type: "image",
+      });
+      photo = result.secure_url; // Use the secure URL from Cloudinary
+    } catch (error) {
+      res.status(500);
+      throw new Error("Image upload failed. Please try again.");
+    }
   }
 
   const newItem = new Item({
