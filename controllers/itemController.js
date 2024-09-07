@@ -107,15 +107,8 @@ const createItem = asyncHandler(async (req, res) => {
 // @route   PATCH /api/items/:id
 const updateItem = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const {
-    name,
-    description,
-    itemCode,
-    category,
-    quantity,
-    reorderLevel,
-    photo,
-  } = req.body;
+  const { name, description, itemCode, category, quantity, reorderLevel } =
+    req.body;
 
   const item = await Item.findById(id);
 
@@ -149,7 +142,20 @@ const updateItem = asyncHandler(async (req, res) => {
   if (description) item.description = description;
   if (quantity !== undefined) item.quantity = quantity;
   if (reorderLevel !== undefined) item.reorderLevel = reorderLevel;
-  if (photo) item.photo = photo;
+
+  // Handle image upload to Cloudinary if a file is provided
+  if (req.file) {
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "IMS items",
+        resource_type: "image",
+      });
+      item.photo = result.secure_url; // Use the secure URL from Cloudinary
+    } catch (error) {
+      res.status(500);
+      throw new Error("Image upload failed. Please try again.");
+    }
+  }
   item.lastUpdated = Date.now();
 
   const updatedItem = await item.save();
