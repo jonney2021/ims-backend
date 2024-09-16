@@ -14,7 +14,7 @@ const getAllItems = asyncHandler(async (req, res) => {
 });
 
 // @desc    Get a specific item by name
-// @route   GET /api/items/:name
+// @route   GET /api/items/name/:name
 const getItemByName = asyncHandler(async (req, res) => {
   const itemName = req.params.name;
   // const item = await Item.findOne({ name: itemName });
