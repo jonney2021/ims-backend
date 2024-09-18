@@ -13,6 +13,20 @@ const getAllItems = asyncHandler(async (req, res) => {
   res.status(200).json(items);
 });
 
+// @desc    Get a specific item by ID
+// @route   GET /api/items/:id
+const getItemById = asyncHandler(async (req, res) => {
+  const id = req.params.id;
+  const item = await Item.findById(id).populate("category");
+
+  if (!item) {
+    res.status(404);
+    throw new Error("Item not found");
+  }
+
+  res.status(200).json(item);
+});
+
 // @desc    Get a specific item by name
 // @route   GET /api/items/name/:name
 const getItemByName = asyncHandler(async (req, res) => {
@@ -143,6 +157,8 @@ const updateItem = asyncHandler(async (req, res) => {
   if (quantity !== undefined) item.quantity = quantity;
   if (reorderLevel !== undefined) item.reorderLevel = reorderLevel;
 
+  let photo = item.photo; // Keep the existing photo by default
+
   // Handle image upload to Cloudinary if a file is provided
   if (req.file) {
     try {
@@ -150,7 +166,7 @@ const updateItem = asyncHandler(async (req, res) => {
         folder: "IMS items",
         resource_type: "image",
       });
-      item.photo = result.secure_url; // Use the secure URL from Cloudinary
+      photo = result.secure_url; // Use the secure URL from Cloudinary
     } catch (error) {
       res.status(500);
       throw new Error("Image upload failed. Please try again.");
@@ -158,8 +174,38 @@ const updateItem = asyncHandler(async (req, res) => {
   }
   item.lastUpdated = Date.now();
 
-  const updatedItem = await item.save();
-  res.status(200).json(updatedItem);
+  // const updatedItem = await item.save();
+  // res.status(200).json(updatedItem);
+  try {
+    const updatedItem = await Item.findByIdAndUpdate(
+      id,
+      {
+        name: name || item.name,
+        description: description || item.description,
+        itemCode: itemCode || item.itemCode,
+        category: category || item.category,
+        quantity: quantity !== undefined ? quantity : item.quantity,
+        reorderLevel:
+          reorderLevel !== undefined ? reorderLevel : item.reorderLevel,
+        photo: photo,
+        lastUpdated: Date.now(),
+      },
+      { new: true, runValidators: true }
+    ).populate("category");
+
+    console.log("Updated item:", updatedItem);
+
+    if (!updatedItem) {
+      res.status(404);
+      throw new Error("Item not found");
+    }
+
+    res.status(200).json(updatedItem);
+  } catch (error) {
+    console.error("Error updating item:", error);
+    res.status(500);
+    throw new Error("Failed to update item. Please try again.");
+  }
 });
 
 // @desc    Delete an item by ID
@@ -179,6 +225,7 @@ const deleteItem = asyncHandler(async (req, res) => {
 
 module.exports = {
   getAllItems,
+  getItemById,
   getItemByName,
   getItemByCode,
   createItem,
