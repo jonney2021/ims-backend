@@ -8,6 +8,21 @@ const getCategories = asyncHandler(async (req, res) => {
   res.status(200).json(categories);
 });
 
+// @desc    Get a single category by ID
+// @route   GET /api/categories/:id
+const getCategory = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  const category = await Category.findById(id);
+
+  if (!category) {
+    res.status(404);
+    throw new Error("Category not found");
+  }
+
+  res.status(200).json(category);
+});
+
 // @desc    Create a new category
 // @route   POST /api/categories
 const createCategory = asyncHandler(async (req, res) => {
@@ -68,6 +83,7 @@ const deleteCategory = asyncHandler(async (req, res) => {
 
 module.exports = {
   getCategories,
+  getCategory,
   createCategory,
   updateCategory,
   deleteCategory,
