@@ -5,6 +5,7 @@ const bcrypt = require("bcryptjs");
 const Token = require("../models/Token");
 const crypto = require("crypto");
 const sendEmail = require("../utils/sendEmail");
+const cloudinary = require("cloudinary").v2;
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -16,9 +17,9 @@ const generateToken = (id) => {
 // @route   POST /api/users/register
 
 const registerUser = asyncHandler(async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, email, password, role } = req.body;
 
-  // Check if any field is empty
+  // Check if any required field is empty
   if (!username || !email || !password) {
     res.status(400);
     throw new Error("Please fill in all required fields");
@@ -35,11 +36,29 @@ const registerUser = asyncHandler(async (req, res) => {
     throw new Error("User with this email already exists");
   }
 
-  // Create new user
-  const user = await User.create({ username, email, password });
+  // Handle photo upload to Cloudinary
+  let photoUrl = "https://i.ibb.co/4pDNDk1/avatar.png"; // default photo
+  if (req.file) {
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "IMS users",
+        resource_type: "image",
+      });
+      photoUrl = result.secure_url;
+    } catch (error) {
+      res.status(500);
+      throw new Error("Image upload failed. Please try again.");
+    }
+  }
 
-  // Generate token
-  // const token = generateToken(user._id);
+  // Create new user
+  const user = await User.create({
+    username,
+    email,
+    password,
+    role: role || "User", // Use the provided role or default to 'User'
+    photo: photoUrl,
+  });
 
   if (user) {
     res.status(201).json({
@@ -48,7 +67,6 @@ const registerUser = asyncHandler(async (req, res) => {
       email: user.email,
       photo: user.photo,
       role: user.role,
-      // token,
     });
   } else {
     res.status(400);
