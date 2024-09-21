@@ -23,7 +23,7 @@ const router = express.Router();
 // Register route protected by adminOnly middleware
 // router.post("/register", protect, adminOnly, registerUser);
 // Modified Route for Testing (Remove adminOnly temporarily)
-router.post("/register", upload.single("photo"), registerUser);
+router.post("/register", upload.single("photo"), adminOnly, registerUser);
 
 // Login route
 router.post("/login", loginUser);
@@ -32,7 +32,7 @@ router.post("/login", loginUser);
 router.get("/logout", logoutUser);
 
 // get user profile
-router.get("/profile", protect, getProfile);
+router.get("/profile", getProfile);
 
 // Route to get login status
 router.get("/loggedin", loginStatus);
@@ -61,9 +61,9 @@ router.get("/:username", getUserByName);
 
 // Router to admin update user
 // router.patch("/update/:id", protect, adminOnly, adminUpdateUser);
-router.patch("/:id", upload.single("photo"), adminUpdateUser);
+router.patch("/:id", upload.single("photo"), adminOnly, adminUpdateUser);
 
 // Router to admin delete user
-router.delete("/:id", adminDeleteUser);
+router.delete("/:id", adminOnly, adminDeleteUser);
 
 module.exports = router;

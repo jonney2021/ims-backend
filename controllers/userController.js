@@ -109,8 +109,10 @@ const loginUser = asyncHandler(async (req, res) => {
     res.cookie("token", token, {
       path: "/",
       httpOnly: true,
-      sameSite: "none",
+      // sameSite: "none",
       // secure: true, // Enable in production
+      sameSite: "lax",
+      secure: false,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
@@ -152,18 +154,46 @@ const getProfile = asyncHandler(async (req, res) => {
 
 // Get login status
 // @route   GET /api/users/loggedin
+// const loginStatus = asyncHandler(async (req, res) => {
+//   const token = req.cookies.token;
+//   if (!token) {
+//     return res.json(false);
+//   }
+
+//   // Verify token
+//   const verified = jwt.verify(token, process.env.JWT_SECRET);
+//   if (verified) {
+//     return res.json(true);
+//   }
+//   return res.json(false);
+// });
+
 const loginStatus = asyncHandler(async (req, res) => {
   const token = req.cookies.token;
   if (!token) {
-    return res.json(false);
+    return res.json({ isLoggedIn: false });
   }
 
-  // Verify token
-  const verified = jwt.verify(token, process.env.JWT_SECRET);
-  if (verified) {
-    return res.json(true);
+  try {
+    const verified = jwt.verify(token, process.env.JWT_SECRET);
+    if (verified) {
+      const user = await User.findById(verified.id).select("-password");
+      return res.json({
+        isLoggedIn: true,
+        user: {
+          _id: user._id,
+          username: user.username,
+          email: user.email,
+          photo: user.photo,
+          role: user.role,
+        },
+      });
+    }
+  } catch (error) {
+    console.error("Error verifying token:", error);
   }
-  return res.json(false);
+
+  return res.json({ isLoggedIn: false });
 });
 
 // Update User Profile
