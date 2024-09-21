@@ -341,6 +341,23 @@ const getUserByName = asyncHandler(async (req, res) => {
   res.status(200).json(user);
 });
 
+// @desc    Get user by id
+// @route   GET /api/users/:id
+// @access  Admin
+const getUserById = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  // Find user by ID
+  const user = await User.findById(id).select("-password");
+
+  if (!user) {
+    res.status(404);
+    throw new Error("User not found");
+  }
+
+  res.status(200).json(user);
+});
+
 // @desc    Admin Update User
 // @route   PATCH /api/users/:id
 // @access  Admin
@@ -361,6 +378,20 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
   user.email = email || user.email;
   user.role = role || user.role; // Update role only if provided
 
+  // Handle photo upload
+  if (req.file) {
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: "IMS users",
+        resource_type: "image",
+      });
+      user.photo = result.secure_url;
+    } catch (error) {
+      res.status(500);
+      throw new Error("Image upload failed. Please try again.");
+    }
+  }
+
   const updatedUser = await user.save();
 
   res.status(200).json({
@@ -370,6 +401,7 @@ const adminUpdateUser = asyncHandler(async (req, res) => {
       username: updatedUser.username,
       email: updatedUser.email,
       role: updatedUser.role,
+      photo: updatedUser.photo,
     },
   });
 });
@@ -404,6 +436,7 @@ module.exports = {
   forgotPassword,
   resetPassword,
   getAllUsers,
+  getUserById,
   getUserByName,
   adminUpdateUser,
   adminDeleteUser,

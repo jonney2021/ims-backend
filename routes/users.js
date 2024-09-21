@@ -10,6 +10,7 @@ const {
   forgotPassword,
   resetPassword,
   getAllUsers,
+  getUserById,
   getUserByName,
   adminUpdateUser,
   adminDeleteUser,
@@ -51,13 +52,18 @@ router.put("/resetpassword/:resetToken", resetPassword);
 // Router to admin get all users
 router.get("/", getAllUsers);
 
+// Router to admin get user by id
+router.get("/:id", getUserById);
+
 // Router to admin get user by username
-router.get("/:username", protect, adminOnly, getUserByName);
+// router.get("/:username", protect, getUserByName);
+router.get("/:username", getUserByName);
 
 // Router to admin update user
-router.patch("/update/:id", protect, adminOnly, adminUpdateUser);
+// router.patch("/update/:id", protect, adminOnly, adminUpdateUser);
+router.patch("/:id", upload.single("photo"), adminUpdateUser);
 
 // Router to admin delete user
-router.delete("/delete/:id", protect, adminOnly, adminDeleteUser);
+router.delete("/:id", adminDeleteUser);
 
 module.exports = router;
