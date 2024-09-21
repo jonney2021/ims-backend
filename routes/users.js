@@ -34,11 +34,11 @@ router.get("/logout", logoutUser);
 // get user profile
 router.get("/profile", getProfile);
 
+// Route to update profile
+router.patch("/updateprofile", upload.single("photo"), protect, updateProfile);
+
 // Route to get login status
 router.get("/loggedin", loginStatus);
-
-// Route to update profile
-router.patch("/updateprofile", protect, updateProfile);
 
 // Route to change password
 router.patch("/changepassword", protect, changePassword);

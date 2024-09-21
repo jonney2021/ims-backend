@@ -142,14 +142,24 @@ const logoutUser = asyncHandler(async (req, res) => {
 // Get User Profile
 // @route   GET /api/users/profile
 const getProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id).select("-password");
+  if (!req.user) {
+    res.status(401);
+    throw new Error("User not authenticated");
+  }
 
-  if (user) {
-    res.status(200).json(user);
-  } else {
+  const user = await User.findById(req.user._id).select("-password");
+  if (!user) {
     res.status(404);
     throw new Error("User not found");
   }
+
+  res.status(200).json({
+    _id: user._id,
+    username: user.username,
+    email: user.email,
+    role: user.role,
+    photo: user.photo,
+  });
 });
 
 // Get login status
@@ -199,13 +209,38 @@ const loginStatus = asyncHandler(async (req, res) => {
 // Update User Profile
 // @route   PATCH /api/users/updateprofile
 const updateProfile = asyncHandler(async (req, res) => {
-  const user = await User.findById(req.user._id);
+  // console.log("Received update profile request:", req.body);
+  // console.log("Authenticated user:", req.user);
+
+  // Use the _id from the request body if req.user is undefined
+  const userId = req.user?._id || req.body._id;
+
+  if (!userId) {
+    res.status(401);
+    throw new Error("User not authenticated");
+  }
+
+  const user = await User.findById(userId);
 
   if (user) {
-    const { username, email, photo } = user;
-    user.username = req.body.username || username;
-    user.email = email;
-    user.photo = req.body.photo || photo;
+    const { username } = req.body;
+
+    user.username = username || user.username;
+    // Email is not updated, keeping it as is
+
+    // Handle photo upload
+    if (req.file) {
+      try {
+        const result = await cloudinary.uploader.upload(req.file.path, {
+          folder: "IMS users",
+          resource_type: "image",
+        });
+        user.photo = result.secure_url;
+      } catch (error) {
+        res.status(500);
+        throw new Error("Image upload failed. Please try again.");
+      }
+    }
 
     const updatedUser = await user.save();
     res.status(200).json({
@@ -213,6 +248,7 @@ const updateProfile = asyncHandler(async (req, res) => {
       username: updatedUser.username,
       email: updatedUser.email,
       photo: updatedUser.photo,
+      role: updatedUser.role,
     });
   } else {
     res.status(404);
