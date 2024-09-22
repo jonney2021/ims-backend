@@ -5,6 +5,7 @@ require("dotenv").config();
 const userRoutes = require("./routes/users");
 const itemRoutes = require("./routes/items");
 const categoryRoutes = require("./routes/categories");
+const contactRoutes = require("./routes/contact");
 const errorHandler = require("./middleware/errorMiddleware");
 const cookieParser = require("cookie-parser");
 const path = require("path");
@@ -32,6 +33,7 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api/users", userRoutes);
 app.use("/api/items", itemRoutes);
 app.use("/api/categories", categoryRoutes);
+app.use("/api/contact", contactRoutes);
 
 // Error Handler
 app.use(errorHandler);
