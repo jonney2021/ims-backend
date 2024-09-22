@@ -10,7 +10,7 @@ const {
   getLowStockItems,
 } = require("../controllers/itemController");
 const { upload } = require("../utils/fileUpload");
-const { adminOnly, protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 
 const router = express.Router();
 

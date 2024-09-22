@@ -44,6 +44,7 @@ const itemSchema = new mongoose.Schema({
     type: String,
     default: "https://via.placeholder.com/100", // Default placeholder image URL
   },
+  lowStockEmailSent: { type: Boolean, default: false },
 });
 
 module.exports = mongoose.model("Item", itemSchema);

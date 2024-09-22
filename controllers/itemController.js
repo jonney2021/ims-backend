@@ -1,6 +1,7 @@
 const Item = require("../models/Item");
 const Category = require("../models/Category");
 const asyncHandler = require("express-async-handler");
+const sendLowStockEmail = require("../utils/lowStockEmailer");
 const cloudinary = require("cloudinary").v2;
 
 // @desc    Get all items
@@ -199,6 +200,27 @@ const updateItem = asyncHandler(async (req, res) => {
       res.status(404);
       throw new Error("Item not found");
     }
+
+    // Check if the item is now low in stock and email hasn't been sent
+    if (
+      updatedItem.quantity <= updatedItem.reorderLevel &&
+      !updatedItem.lowStockEmailSent
+    ) {
+      await sendLowStockEmail(updatedItem);
+      updatedItem.lowStockEmailSent = true;
+      await updatedItem.save();
+    }
+
+    // If quantity is now above reorder level, reset the flag
+    if (
+      updatedItem.quantity > updatedItem.reorderLevel &&
+      updatedItem.lowStockEmailSent
+    ) {
+      updatedItem.lowStockEmailSent = false;
+      await updatedItem.save();
+    }
+
+    console.log("Updated item:", updatedItem);
 
     res.status(200).json(updatedItem);
   } catch (error) {

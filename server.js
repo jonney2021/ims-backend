@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const cron = require("node-cron");
+const checkLowStockAndSendEmails = require("./utils/dailyLowStockChecker");
 const cors = require("cors");
 require("dotenv").config();
 const userRoutes = require("./routes/users");
@@ -47,6 +49,12 @@ mongoose
 // Route
 app.get("/", (req, res) => {
   res.send("Inventory Management System API");
+});
+
+// Run the task every day at midnight
+cron.schedule("0 0 * * *", () => {
+  console.log("Running daily low stock check");
+  checkLowStockAndSendEmails();
 });
 
 // Start Server
