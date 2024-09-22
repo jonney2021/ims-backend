@@ -41,7 +41,7 @@ router.patch("/updateprofile", upload.single("photo"), protect, updateProfile);
 router.get("/loggedin", loginStatus);
 
 // Route to change password
-router.patch("/changepassword", protect, changePassword);
+router.put("/changepassword", protect, changePassword);
 
 // Route to forgot password
 router.post("/forgotpassword", forgotPassword);

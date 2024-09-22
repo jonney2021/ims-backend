@@ -257,7 +257,7 @@ const updateProfile = asyncHandler(async (req, res) => {
 });
 
 // Change Password
-// @route   PATCH /api/users/changepassword
+// @route   PUT /api/users/changepassword
 const changePassword = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user._id);
   const { oldPassword, password } = req.body;
