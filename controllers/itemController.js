@@ -223,6 +223,16 @@ const deleteItem = asyncHandler(async (req, res) => {
   res.status(200).json({ message: "Item deleted successfully" });
 });
 
+// @desc    Get all low stock items
+// @route   GET /api/items/low-stock
+const getLowStockItems = asyncHandler(async (req, res) => {
+  const lowStockItems = await Item.find({
+    $expr: { $lte: ["$quantity", "$reorderLevel"] },
+  }).populate("category");
+
+  res.status(200).json(lowStockItems);
+});
+
 module.exports = {
   getAllItems,
   getItemById,
@@ -231,4 +241,5 @@ module.exports = {
   createItem,
   updateItem,
   deleteItem,
+  getLowStockItems,
 };

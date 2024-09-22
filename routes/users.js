@@ -15,7 +15,7 @@ const {
   adminUpdateUser,
   adminDeleteUser,
 } = require("../controllers/userController");
-const { adminOnly, protect } = require("../middleware/authMiddleware");
+const { protect } = require("../middleware/authMiddleware");
 const { upload } = require("../utils/fileUpload");
 const router = express.Router();
 
@@ -23,7 +23,7 @@ const router = express.Router();
 // Register route protected by adminOnly middleware
 // router.post("/register", protect, adminOnly, registerUser);
 // Modified Route for Testing (Remove adminOnly temporarily)
-router.post("/register", upload.single("photo"), adminOnly, registerUser);
+router.post("/register", upload.single("photo"), protect, registerUser);
 
 // Login route
 router.post("/login", loginUser);
@@ -61,9 +61,9 @@ router.get("/:username", getUserByName);
 
 // Router to admin update user
 // router.patch("/update/:id", protect, adminOnly, adminUpdateUser);
-router.patch("/:id", upload.single("photo"), adminOnly, adminUpdateUser);
+router.patch("/:id", upload.single("photo"), protect, adminUpdateUser);
 
 // Router to admin delete user
-router.delete("/:id", adminOnly, adminDeleteUser);
+router.delete("/:id", protect, adminDeleteUser);
 
 module.exports = router;
