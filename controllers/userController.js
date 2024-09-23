@@ -111,8 +111,13 @@ const loginUser = asyncHandler(async (req, res) => {
       httpOnly: true,
       // sameSite: "none",
       // secure: true, // Enable in production
-      sameSite: "lax",
-      secure: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      domain:
+        process.env.NODE_ENV === "production"
+          ? process.env.FRONTEND_URL
+          : "localhost",
+      // secure: false,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
 
