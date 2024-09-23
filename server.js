@@ -18,7 +18,13 @@ const app = express();
 // app.use(cors());
 // app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(
-  cors({ origin: "https://ims-frontend-tawny.vercel.app", credentials: true })
+  cors({
+    origin:
+      process.env.NODE_ENV === "production"
+        ? "https://ims-frontend-tawny.vercel.app"
+        : "http://localhost:5173",
+    credentials: true,
+  })
 );
 
 app.use(express.json());

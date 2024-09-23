@@ -113,10 +113,10 @@ const loginUser = asyncHandler(async (req, res) => {
       // secure: true, // Enable in production
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      domain:
-        process.env.NODE_ENV === "production"
-          ? "ims-frontend-tawny.vercel.app"
-          : "localhost",
+      // domain:
+      //   process.env.NODE_ENV === "production"
+      //     ? "ims-frontend-tawny.vercel.app"
+      //     : "localhost",
       // secure: false,
       maxAge: 24 * 60 * 60 * 1000, // 24 hours
     });
