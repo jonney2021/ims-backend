@@ -208,6 +208,7 @@ const updateItem = asyncHandler(async (req, res) => {
     ) {
       await sendLowStockEmail(updatedItem);
       updatedItem.lowStockEmailSent = true;
+      updatedItem.lowStockEmailSentDate = new Date();
       await updatedItem.save();
     }
 
@@ -217,6 +218,7 @@ const updateItem = asyncHandler(async (req, res) => {
       updatedItem.lowStockEmailSent
     ) {
       updatedItem.lowStockEmailSent = false;
+      updatedItem.lowStockEmailSentDate = null;
       await updatedItem.save();
     }
 
