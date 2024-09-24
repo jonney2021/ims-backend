@@ -1,4 +1,5 @@
 const Category = require("../models/Category");
+const Item = require("../models/Item");
 const asyncHandler = require("express-async-handler");
 
 // @desc    Get all categories
@@ -74,6 +75,16 @@ const deleteCategory = asyncHandler(async (req, res) => {
   if (!category) {
     res.status(404);
     throw new Error("Category not found");
+  }
+
+  // Check if there are any items in this category
+  const itemsInCategory = await Item.countDocuments({ category: id });
+
+  if (itemsInCategory > 0) {
+    res.status(400);
+    throw new Error(
+      "Cannot delete category with existing items. Please remove or reassign items first."
+    );
   }
 
   await Category.findByIdAndDelete(id);
