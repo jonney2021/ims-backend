@@ -15,8 +15,9 @@ const sendLowStockEmail = async (item) => {
   `;
   const send_to = process.env.MANAGER_EMAIL;
   const sent_from = process.env.EMAIL_USER;
+  const reply_to = process.env.EMAIL_USER;
 
-  await sendEmail(subject, message, send_to, sent_from, sent_from);
+  await sendEmail(subject, message, send_to, sent_from, reply_to);
 };
 
 module.exports = sendLowStockEmail;
